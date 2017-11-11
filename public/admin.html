@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<title>Admin</title>
+<!-- JQuery Dependecies-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script> -->
+<script src="https://code.jquery.com/ui/1.12.0-rc.2/jquery-ui.min.js" integrity="sha256-55Jz3pBCF8z9jBO1qQ7cIf0L+neuPTD1u7Ytzrp2dqo=" crossorigin="anonymous"></script>
+<!-- Angular JS Dependencies -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-route.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-resource.js"></script>
+<!-- Bootstrap Dependencies -->
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<!-- Controller -->
+<script src="/js/main.js"></script>
+<!-- css -->
+<link rel="stylesheet" href="/css/style.css">
+
+<body>
+    <H1>Trail Walker Tracker</H1>
+    <div id="lastUpdateTime">Last Updated Time: </div>
+    <div id="lastUpdateMark">Last Updated Mark: </div>
+    <br>
+    <table id="table" border="1" style="font-size: 150%">
+        <tr>
+            <td>檢查點</td>
+            <td>地點</td>
+            <td>原定到達時間</td>
+            <td>實際到達時間</td>
+            <td>時間差</td>
+            <td>預計到達時間</td>
+        </tr>
+    </table>
+    <br>
+    <button id="refreshBtn">Refresh</button>
+    <br>
+    <input id="checkPoint" type="number", min="1", step="1", max="10">
+    <button id="updateBtn">Update</button>
+</body>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    init();
+
+    $("#refreshBtn").click(function() {
+        $.get("/refresh", function(result) {
+            console.log(result);
+            if (!result.ok) return;
+            $("#table").find("tr:gt(0)").remove();
+            appendUpdate(result);
+            appendTable(result.itemList);
+
+        })
+    });
+
+    $("#updateBtn").click(function() {
+        var checkPoint = $("#checkPoint").val();
+        console.log(checkPoint)
+        $.get("/update", {"checkPoint":checkPoint}, function(result) {
+            alert(result);
+        })
+    });
+
+    function makeElement(item) {
+        return "<td>" + item + "</td>";
+    }
+
+    function makeRow(item) {
+        return "<tr>" + item + "</tr>";
+    }
+
+    function init() {
+        $.get("/refresh", function(result) {
+            console.log(result);
+            if (!result.ok) return;
+            appendUpdate(result);
+            appendTable(result.itemList);
+        })
+    }
+
+    function appendTable(itemList) {
+        itemList.forEach(function(item) {
+            $("#table").append(
+                makeRow(
+                    makeElement(item.id) +
+                    makeElement(item.name) +
+                    makeElement(makeSimpleDateFormat(item.eta)) +
+                    makeElement(makeSimpleDateFormat(item.actualTime)) +
+                    makeElement(calculateDifference(item.eta, item.actualTime)) +
+                    makeElement(makeSimpleDateFormat(item.newTime))
+                )
+            );
+        });
+    }
+
+    function calculateDifference(eta, actualTime) {
+        if (actualTime == null) return "-";
+        var timeDiff = 0;
+        var halfHour = 30 * 1000 * 60;
+        var faster = actualTime > eta;
+        var difference = Math.abs(eta - actualTime);
+        while ((difference -= halfHour) > 0) {
+            timeDiff += 0.5;
+        }
+        return (faster) ? ("+" + timeDiff) : ("-" + timeDiff);
+    }
+
+    function appendUpdate(result) {
+        $("#lastUpdateTime").append(new Date(result.lastUpdateTime).toString());
+        $("#lastUpdateMark").append(result.lastUpdateMark);
+    }
+
+    function makeSimpleDateFormat(date) {
+        if (isNaN(date) || date == null) return "-";
+
+        var output = new Date(date);
+        return output.getDate() + "/" +
+            (output.getMonth() + 1) + " " +
+            appendTime(output.getHours()) + ":" +
+            appendTime(output.getMinutes());
+    }
+
+    function appendTime(time) {
+        if (time < 10) {
+            return "0" + time;
+        }
+        return time;
+    }
+
+});
+</script>
+
+</html>
