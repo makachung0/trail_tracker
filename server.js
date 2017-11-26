@@ -25,11 +25,15 @@ app.get("/refresh", function(req, res) {
 
 app.get("/update", function(req, res) {
 	var checkPoint = req.query.checkPoint;
-	console.log(checkPoint)
+	var mark = req.query.mark;
 	if (checkPoint != null) {
 		updateObject.itemList[checkPoint].actualTime = new Date().getTime();
 	}
-    res.send("updated checkPoint " + checkPoint + " on " + updateObject.itemList[checkPoint].actualTime);
+    if (mark != null) {
+        updateObject.lastUpdateMark = mark;
+    }
+    updateObject.lastUpdateTime = new Date();
+    res.send("updated checkPoint " + checkPoint + " on " + mark);
 });
 
 function updateNewTime() {

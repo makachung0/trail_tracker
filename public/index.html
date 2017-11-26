@@ -70,6 +70,9 @@ $(document).ready(function() {
 
     function appendTable(itemList) {
         itemList.forEach(function(item) {
+            if (item.id == "0" || item.id == 0) {
+                item.name = "Starting Point";
+            }
             $("#table").append(
                 makeRow(
                     makeElement(item.id) +
@@ -96,8 +99,8 @@ $(document).ready(function() {
     }
 
     function appendUpdate(result) {
-        $("#lastUpdateTime").append(new Date(result.lastUpdateTime).toString());
-        $("#lastUpdateMark").append(result.lastUpdateMark);
+        $("#lastUpdateTime").html("Last Updated Time: " + new Date(result.lastUpdateTime).toString());
+        $("#lastUpdateMark").html("Last Updated Mark: " + result.lastUpdateMark);
     }
 
     function makeSimpleDateFormat(date) {

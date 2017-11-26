@@ -1,7 +1,7 @@
 var updateObject = {};
 var checkPoint = {};
-// var startTime = 1510898400000; //hkt 17 Nov 14:00
-var startTime = 1510452000000;
+var startTime = 1510898400000; //hkt 17 Nov 14:00
+// var startTime = 1510452000000;
 var hour = 1000 * 60 * 60;
 var minute = 1000 * 60;
 

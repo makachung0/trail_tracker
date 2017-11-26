@@ -35,7 +35,8 @@
     <br>
     <button id="refreshBtn">Refresh</button>
     <br>
-    <input id="checkPoint" type="number", min="1", step="1", max="10">
+    <input id="checkPoint" type="number" min="0" step="1" max="10" placeholder="checkPoint" style="width: 10%">
+    <input id="mark" type="number" min="1" step="1" max="200" placeholder="mark" style="width: 10%">
     <button id="updateBtn">Update</button>
 </body>
 <script type="text/javascript">
@@ -56,8 +57,8 @@ $(document).ready(function() {
 
     $("#updateBtn").click(function() {
         var checkPoint = $("#checkPoint").val();
-        console.log(checkPoint)
-        $.get("/update", {"checkPoint":checkPoint}, function(result) {
+        var mark = $("#mark").val();
+        $.get("/update", {"checkPoint":checkPoint, "mark":mark}, function(result) {
             alert(result);
         })
     });
@@ -107,8 +108,8 @@ $(document).ready(function() {
     }
 
     function appendUpdate(result) {
-        $("#lastUpdateTime").append(new Date(result.lastUpdateTime).toString());
-        $("#lastUpdateMark").append(result.lastUpdateMark);
+        $("#lastUpdateTime").html(new Date(result.lastUpdateTime).toString());
+        $("#lastUpdateMark").html(result.lastUpdateMark);
     }
 
     function makeSimpleDateFormat(date) {
